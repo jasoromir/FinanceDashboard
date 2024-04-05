@@ -1,5 +1,6 @@
 
 import pandas as pd
+import numpy as np
 from constants import dict_names
 
 def get_data(ticker):
@@ -23,11 +24,16 @@ def get_data(ticker):
         elif keyword in list(info_sheet.keys()):
             value = info_sheet[keyword]
         elif name == 'Growth Rate':
-            eps_forward = info_sheet['forwardEps']
-            eps_current = info_sheet['trailingEps']
-            value = (eps_forward/eps_current-1)*100
-        else:
+            try:
+                eps_forward = info_sheet['forwardEps']
+                eps_current = info_sheet['trailingEps']
+                value = (eps_forward/eps_current-1)*100
+            except:
+                value = 0
+        elif name in ['Desired Rate of Return', 'Margin of Safety']:
             value = dict_names[name]
+        else:
+            value = np.nan
         dict_values[name] = value
 
     df = pd.DataFrame(dict_values.items(), columns = ['fields', 'values'])

@@ -2,6 +2,7 @@ import streamlit as st
 import yfinance as yf
 import numpy as np
 import pandas as pd
+import math
 
 from millify import millify, prettify
 
@@ -64,6 +65,17 @@ balance_strength = m.get_balance_stength(df)
 free_cash_flow = m.get_fcf(df)
 ev = m.get_ev(df)
 
+# metrics = [dfc10, dfc5, graham_growth,graham_number, buffet_ratio,roe,munger_multiplier,sgr,peg,earning_yield,roce,ncav,dygr,balance_strength,free_cash_flow,ev]
+
+# check_metrics_nan = 0
+# for metric in metrics:
+#     if math.isnan(metric):
+#         check_metrics_nan += 1
+
+metrics_missing = []
+for idx, row in df.iterrows():
+    if math.isnan( row['values']):
+        metrics_missing.append(row['fields'])
 
 
 st.write(f'## Metrics')
@@ -72,44 +84,57 @@ col1, col2, col3 = st.columns(3)
 
 stock_price = df.loc[df.fields == 'Stock Price', 'values'].values[0]
 
-delta =  millify(dfc10-stock_price, precision = 2)
-col1.metric('10 years DCF', millify(dfc10, precision = 2), delta)
-delta =  millify(dfc5-stock_price, precision = 2)
-col2.metric('5 years DCF', millify(dfc5, precision = 2), delta)
-col3.metric('', '')
-col3.metric('', '')
-col3.metric('', '')
+# if check_metrics_nan > 2:
+if len(metrics_missing) > 2:
+    st.warning(f'Metrics are missing: {metrics_missing}')
+else:
+    delta =  millify(dfc10-stock_price, precision = 2)
+    col1.metric('10 years DCF', millify(dfc10, precision = 2), delta)
+    delta =  millify(dfc5-stock_price, precision = 2)
+    col2.metric('5 years DCF', millify(dfc5, precision = 2), delta)
+    col3.metric('', '')
+    col3.metric('', '')
+    col3.metric('', '')
 
-delta =  millify(graham_number-stock_price, precision = 2)
-col1.metric('GRAHMAR NUMBER', millify(graham_number, precision = 2), delta, delta_color = 'inverse')
-col2.metric('GRAHMAR GROWTH', millify(graham_growth, precision = 2), 0, delta_color = 'off')
-col3.metric('', '')
-col3.metric('', '')
+    delta =  millify(graham_number-stock_price, precision = 2)
+    col1.metric('GRAHMAR NUMBER', millify(graham_number, precision = 2), delta, delta_color = 'inverse')
+    col2.metric('GRAHMAR GROWTH', millify(graham_growth, precision = 2), 0, delta_color = 'off')
+    col3.metric('', '')
+    col3.metric('', '')
 
-delta =  millify(buffet_ratio-1, precision = 2)
-col1.metric('BUFFET RATIO', millify(buffet_ratio, precision = 2), delta)
-delta =  millify(sgr*100-10, precision = 2)
-col2.metric('SGR', millify(sgr*100, precision = 2), delta)
-delta =  millify(roe*100-12, precision = 2)
-col3.metric('ROE', millify(roe*100, precision = 2), delta)
+    delta =  millify(buffet_ratio-1, precision = 2)
+    col1.metric('BUFFET RATIO', millify(buffet_ratio, precision = 2), delta)
+    try:
+        delta =  millify(sgr*100-10, precision = 2)
+        col2.metric('SGR', millify(sgr*100, precision = 2), delta)
+    except:
+        delta = 0
+        col2.metric('SGR', np.nan, delta,  delta_color = 'off')
 
-delta =  millify(munger_multiplier-15, precision = 2)
-col1.metric('MUNGER MULTIPLE', millify(munger_multiplier, precision = 2), delta)
-delta =  millify(peg-1, precision = 2)
-col2.metric('PEG', millify(peg, precision = 2), delta, delta_color = 'inverse')
-delta =  millify(earning_yield-1, precision = 2)
-col3.metric('EARNING YIELD', millify(earning_yield, precision = 2), delta)
+    delta =  millify(roe*100-12, precision = 2)
+    col3.metric('ROE', millify(roe*100, precision = 2), delta)
 
-delta =  millify(roce*100-20, precision = 2)
-col1.metric('ROCE', millify(roce*100, precision = 2), delta)
-delta =  millify(ncav-stock_price, precision = 2)
-col2.metric('NCAV', millify(ncav, precision = 2), delta)
-delta =  millify(dygr-1, precision = 2)
-col3.metric('DYGR', millify(dygr, precision = 2), delta)
+    delta =  millify(munger_multiplier-15, precision = 2)
+    col1.metric('MUNGER MULTIPLE', millify(munger_multiplier, precision = 2), delta)
+    delta =  millify(peg-1, precision = 2)
+    col2.metric('PEG', millify(peg, precision = 2), delta, delta_color = 'inverse')
+    delta =  millify(earning_yield-1, precision = 2)
+    col3.metric('EARNING YIELD', millify(earning_yield, precision = 2), delta)
 
-delta =  millify(balance_strength-0, precision = 2)
-col1.metric('BALANCE SHEET STRENGTH', millify(balance_strength, precision = 2), delta)
-delta =  millify(free_cash_flow-5, precision = 2)
-col2.metric('FCF YIELD', millify(free_cash_flow, precision = 2), delta)
-delta =  millify(ev-12, precision = 2)
-col3.metric('EV', millify(ev, precision = 2), delta, delta_color = 'inverse')
+    delta =  millify(roce*100-20, precision = 2)
+    col1.metric('ROCE', millify(roce*100, precision = 2), delta)
+    delta =  millify(ncav-stock_price, precision = 2)
+    col2.metric('NCAV', millify(ncav, precision = 2), delta)
+    try:
+        delta =  millify(dygr-1, precision = 2)
+        col3.metric('DYGR', millify(dygr, precision = 2), delta)
+    except:
+        delta =  0
+        col3.metric('DYGR', np.nan, delta,  delta_color = 'off')
+
+    delta =  millify(balance_strength-0, precision = 2)
+    col1.metric('BALANCE SHEET STRENGTH', millify(balance_strength, precision = 2), delta)
+    delta =  millify(free_cash_flow-5, precision = 2)
+    col2.metric('FCF YIELD', millify(free_cash_flow, precision = 2), delta)
+    delta =  millify(ev-12, precision = 2)
+    col3.metric('EV', millify(ev, precision = 2), delta, delta_color = 'inverse')
