@@ -10,16 +10,37 @@ from processing import get_data
 import metrics as m
 
 
-
+st.title('Financial Dashboard')
 ticker_name = st.sidebar.selectbox('Select Company Ticker', ['AAPL', 'GOOG', 'MSFT', 'CHEMM.CO'])
 
-st.title(f'Financial values for {ticker_name}')
+ticker = yf.Ticker(ticker_name)
+
+company_name = ticker.info['longName']
+sector = ticker.info['sector']
+industry = ticker.info['industry']
+website = ticker.info['website']
+business_sumary = ticker.info['longBusinessSummary']
+
+st.write(f'## Financial values for {company_name} ({ticker_name})')
+st.write(f'Sector: {sector}')
+st.write(f'Industry: {industry} ')
+st.write(f'website: {website} ')
+with st.expander('Company business summary'):
+    st.write(f'{business_sumary}')
 
 
 # GET DATA
-ticker = yf.Ticker(ticker_name)
-df = get_data(ticker)
 
+df = get_data(ticker)
+# df_show = df.copy()
+# for field in list(df_show.fields):
+#     try:
+#         df_show.loc[df_show.fields == field, 'values'] = millify(df_show.loc[df_show.fields == field, 'values'], precision = 3)
+#     except:
+#         pass
+
+with st.expander('Open to see detailed information'):
+    st.table(df)
 
 # GET METRICS
 dfc10 = m.get_dfc(df, 10)
@@ -39,8 +60,7 @@ balance_strength = m.get_balance_stength(df)
 free_cash_flow = m.get_fcf(df)
 ev = m.get_ev(df)
 
-with st.expander('Open to see detailed information'):
-    st.table(df)
+
 
 st.write(f'## Metrics')
 col1, col2, col3 = st.columns(3)

@@ -5,6 +5,7 @@ from constants import measure
 
 # DFC per X years
 def get_dfc(df, years):
+    """ """
     eps = df.loc[df.fields == 'EPS (T12M)', 'values'].values[0]
     growth_rate = df.loc[df.fields == 'Growth Rate', 'values'].values[0]
     pe_rate = df.loc[df.fields == 'P/E (T12M)', 'values'].values[0]
