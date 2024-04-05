@@ -29,7 +29,7 @@ def get_data(ticker):
                 eps_current = info_sheet['trailingEps']
                 value = (eps_forward/eps_current-1)*100
             except:
-                value = 0
+                value = np.nan
         elif name in ['Desired Rate of Return', 'Margin of Safety']:
             value = dict_names[name]
         else:
