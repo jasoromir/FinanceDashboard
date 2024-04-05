@@ -11,7 +11,11 @@ import metrics as m
 
 
 st.title('Financial Dashboard')
-ticker_name = st.sidebar.selectbox('Select Company Ticker', ['AAPL', 'GOOG', 'MSFT', 'CHEMM.CO'])
+ticker_list = ['AAPL', 'GOOG', 'MSFT', 'CHEMM.CO']
+ticker_df = pd.read_csv('valid_tickers.csv', sep = ';')
+ticker_list = sorted(list(ticker_df['ticker'].unique()))
+
+ticker_name = st.sidebar.selectbox('Select Company Ticker', ticker_list)
 
 ticker = yf.Ticker(ticker_name)
 
