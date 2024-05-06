@@ -2,17 +2,26 @@ import numpy as np
 from constants import measure
 
 
+def get_stock_price(df):
+    return df.loc[df.fields == 'Stock Price', 'values'].values[0]
+
+def get_eps(df):
+    return df[df['fields'] == 'EPS (T12M)']['values'].values[0]
+
+
+def get_pe(df):
+    return df[df['fields'] == 'P/E (T12M)']['values'].values[0]
 
 # DFC per X years
-def get_dfc(df, years):
+def get_dcf(df, years):
     """ """
     eps = df.loc[df.fields == 'EPS (T12M)', 'values'].values[0]
     growth_rate = df.loc[df.fields == 'Growth Rate', 'values'].values[0]
     pe_rate = df.loc[df.fields == 'P/E (T12M)', 'values'].values[0]
     drr = df.loc[df.fields == 'Desired Rate of Return', 'values'].values[0]/100
 
-    dfc = [eps*(1+growth_rate/100)**i for i in range(0,years)]
-    estimated_after = dfc[-1]*pe_rate
+    dcf = [eps*(1+growth_rate/100)**i for i in range(0,years)]
+    estimated_after = dcf[-1]*pe_rate
     expectStock = [estimated_after/((1+drr)**i) for i in range(0,years)]
     return expectStock[-1]
 
